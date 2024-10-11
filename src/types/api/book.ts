@@ -141,3 +141,13 @@ export type BookApiResponse = {
      */
     meta: BookMeta;
 };
+
+export enum Includes {
+    Indexes = 'indexes',
+}
+
+export type BookApiQueryParameters = {
+    id: number;
+    include?: Includes;
+    ver: number;
+};

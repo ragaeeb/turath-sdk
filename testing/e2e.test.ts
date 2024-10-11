@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getAuthor, getBookFile, getPage } from '../src/index';
+import { getAuthor, getBookFile, getBookInfo, getPage, search } from '../src/index';
 
 describe('e2e', () => {
     describe('getAuthor', () => {
@@ -56,6 +56,7 @@ describe('e2e', () => {
                     meta: {
                         author_name: 'ابن المبرد',
                         book_name: 'جمع الجيوش والدساكر على ابن عساكر',
+                        headings: [],
                         page: 141,
                         page_id: 141,
                         vol: '1',
@@ -79,7 +80,7 @@ describe('e2e', () => {
     });
 
     describe('getBookFile', () => {
-        it.only(
+        it(
             'should get the book data',
             async () => {
                 const book = await getBookFile(17616);
@@ -132,12 +133,108 @@ describe('e2e', () => {
 
                 expect(book.pages).toHaveLength(590);
             },
-            { timeout: 20000 },
+            { timeout: 10000 },
         );
 
         it('should catch 404s', async () => {
             const id = Date.now();
             await expect(getBookFile(id)).rejects.toThrow(`Book ${id} not found`);
         });
+    });
+
+    describe('getBookInfo', () => {
+        it(
+            'should get the book data',
+            async () => {
+                const book = await getBookInfo(147927);
+
+                expect(book).toEqual({
+                    indexes: {
+                        headings: expect.arrayContaining([
+                            { level: 1, page: 2, title: 'تقديم مصطفى العدوي' },
+                            { level: 3, page: 51, title: 'الحديث الخامس' },
+                        ]),
+                        non_author: [],
+                        page_headings: expect.objectContaining({ 2: [1], 67: [68] }),
+                        page_map: expect.arrayContaining(['1,1', '1,67']),
+                        print_pg_to_pg: expect.objectContaining({ '1,1': 1, '1,67': 67 }),
+                        volume_bounds: { '1': [1, 67] },
+                        volumes: ['1'],
+                    },
+                    meta: {
+                        author_id: 44,
+                        author_page_start: 1,
+                        cat_id: 6,
+                        date_built: 1686885098,
+                        id: 147927,
+                        info: expect.any(String),
+                        info_long: '',
+                        name: 'الأربعون النووية مع زيادات ابن رجب',
+                        printed: 3,
+                        type: 5,
+                        version: '1.0',
+                    },
+                });
+            },
+            { timeout: 10000 },
+        );
+
+        it('should catch 404s', async () => {
+            const id = Date.now();
+            await expect(getBookInfo(id)).rejects.toThrow(expect.any(Error));
+        });
+    });
+
+    describe('search', () => {
+        it(
+            'should do a basic search',
+            async () => {
+                const results = await search(`مُجَاهِدٌ وَعِكْرِمَةُ`);
+                expect(results.count > 19000).toBe(true);
+                expect(results.data[0]).toEqual({
+                    author_id: expect.any(Number),
+                    book_id: expect.any(Number),
+                    cat_id: expect.any(Number),
+                    meta: {
+                        author_name: expect.any(String),
+                        book_name: expect.any(String),
+                        headings: expect.any(Array),
+                        page: expect.any(Number),
+                        page_id: expect.any(Number),
+                        vol: expect.any(String),
+                    },
+                    snip: expect.any(String),
+                    text: expect.any(String),
+                });
+            },
+            { timeout: 10000 },
+        );
+
+        it(
+            'should filter by category',
+            async () => {
+                const results = await search(`مُجَاهِدٌ وَعِكْرِمَةُ`, { category: 4 });
+                expect(results.data[0].cat_id).toEqual(4);
+            },
+            { timeout: 10000 },
+        );
+
+        it(
+            'should filter by author',
+            async () => {
+                const results = await search(`مُجَاهِدٌ وَعِكْرِمَةُ`, { author: 51 });
+                expect(results.data[0].author_id).toEqual(51);
+            },
+            { timeout: 10000 },
+        );
+
+        it(
+            'should filter by book',
+            async () => {
+                const results = await search(`مُجَاهِدٌ وَعِكْرِمَةُ`, { book: 2176 });
+                expect(results.data[0].book_id).toEqual(2176);
+            },
+            { timeout: 10000 },
+        );
     });
 });
