@@ -1,0 +1,61 @@
+{
+    "name": "turath-sdk",
+    "description": "JavaScript SDK for accessing turath.io books",
+    "version": "1.0.0",
+    "author": "Ragaeeb Haq",
+    "license": "MIT",
+    "private": false,
+    "main": "dist/main.js",
+    "types": "dist/index.d.ts",
+    "source": "src/index.ts",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ragaeeb/turath-sdk.git"
+    },
+    "engines": {
+        "node": ">=20.0.0"
+    },
+    "files": [
+        "dist/main.js",
+        "dist/main.js.map",
+        "dist/*.d.ts"
+    ],
+    "scripts": {
+        "watch": "parcel watch",
+        "build": "parcel build",
+        "test": "vitest run --coverage",
+        "e2e": "vitest run --config vitest.e2e.config.ts"
+    },
+    "keywords": [
+        "turath.io",
+        "arabic",
+        "islamic"
+    ],
+    "devDependencies": {
+        "@eslint/js": "^9.11.1",
+        "@parcel/packager-ts": "^2.12.0",
+        "@parcel/transformer-typescript-types": "^2.12.0",
+        "@semantic-release/changelog": "^6.0.3",
+        "@semantic-release/git": "^10.0.1",
+        "@types/node": "^22.7.4",
+        "@vitest/coverage-v8": "^2.1.1",
+        "eslint": "^9.11.1",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-orderly-functions": "^1.1.0",
+        "eslint-plugin-perfectionist": "^3.7.0",
+        "eslint-plugin-prettier": "^5.2.1",
+        "eslint-plugin-vitest": "^0.5.4",
+        "eslint-plugin-vitest-globals": "^1.5.0",
+        "parcel": "^2.12.0",
+        "prettier": "^3.3.3",
+        "semantic-release": "^24.1.2",
+        "typescript": "^5.6.2",
+        "typescript-eslint": "^8.8.0",
+        "vitest": "^2.1.1"
+    },
+    "dependencies": {
+        "wretch": "^2.10.0"
+    },
+    "packageManager": "pnpm@9.12.1+sha512.e5a7e52a4183a02d5931057f7a0dbff9d5e9ce3161e33fa68ae392125b79282a8a8a470a51dfc8a0ed86221442eb2fb57019b0990ed24fab519bf0e1bc5ccfc4"
+}

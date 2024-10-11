@@ -2,7 +2,7 @@
 
 # turath-sdk
 
-SDK to access ketabonline.com APIs.
+SDK to access turath.io APIs.
 
 ## Installation
 
