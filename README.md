@@ -2,7 +2,7 @@
 
 # turath-sdk
 
-SDK to access turath.io APIs.
+JavaScript SDK for accessing the books and resources provided by turath.io. This SDK allows you to interact with the turath.io API to retrieve book information, author details, specific pages, and perform searches across the database.
 
 ## Installation
 
@@ -16,55 +16,141 @@ yarn add turath-sdk
 pnpm i turath-sdk
 ```
 
+## Requirements
+
+Node.js >= `20.0.0`
+
 ## Usage
+
+The SDK provides several functions to interact with the turath.io API. Below are the main functions that you can use:
 
 ### Importing the SDK
 
 ```javascript
-import { getBookInfo, getBookContents, downloadBook } from 'turath-sdk';
+import { getBookInfo } from 'turath-sdk';
 ```
 
-### Get Book Information
+### 1. getAuthor
 
-Retrieve metadata about a specific book.
+Fetches information about an author by their ID.
 
-```javascript
+```typescript
+import { getAuthor } from 'turath-sdk';
+
 (async () => {
     try {
-        const bookInfo = await getBookInfo(123);
-        console.log(bookInfo);
+        const author = await getAuthor(44);
+        console.log(author);
     } catch (error) {
         console.error(error.message);
     }
 })();
 ```
 
-### Get Book Contents
+Parameters:
 
-Fetch the contents of a book, including chapters and sections.
+`id` (`number`): The unique identifier of the author.
 
-```javascript
+Returns: A promise that resolves to the author's information.
+
+Throws: Will throw an error if the author is not found.
+
+### 2. `getBookFile`
+
+Fetches the JSON file of a book by its ID.
+
+```typescript
+import { getBookFile } from 'turath-sdk';
+
 (async () => {
     try {
-        const bookContents = await getBookContents(123);
-        console.log(bookContents);
+        const bookFile = await getBookFile(147927);
+        console.log(bookFile);
     } catch (error) {
         console.error(error.message);
     }
 })();
 ```
 
-### Download Book
+Parameters:
 
-Download a book's data to a local file.
+`id` (`number`): The unique identifier of the book.
 
-```javascript
+Returns: A promise that resolves to the book file information.
+
+Throws: Will throw an error if the book file is not found.
+
+### 3. `getBookInfo`
+
+Fetches the information about a book, including its metadata and indexes.
+
+```typescript
+import { getBookInfo } from 'turath-sdk';
+
+(async () => {
+    const bookInfo = await getBookInfo(147927);
+    console.log(bookInfo);
+})();
+```
+
+Parameters:
+
+`id` (`number`): The unique identifier of the book.
+
+Returns: A promise that resolves to the book information including indexes.
+
+### 4. `getPage`
+
+Fetches a specific page from a book by its book ID and page number.
+
+```typescript
+import { getPage } from 'turath-sdk';
+
 (async () => {
     try {
-        const outputFilePath = await downloadBook(123, './book.json');
-        console.log(`Book downloaded to ${outputFilePath}`);
+        const page = await getPage(147927, 5);
+        console.log(page);
     } catch (error) {
         console.error(error.message);
     }
 })();
 ```
+
+Parameters:
+
+`bookId` (`number`): The unique identifier of the book.
+
+`pageNumber` (`number`): The page number to retrieve.
+
+Returns: A promise that resolves to the page metadata and text.
+
+Throws: Will throw an error if the page is not found.
+
+### 5. `search`
+
+Searches for books or content using a query string.
+
+```typescript
+import { search } from 'turath-sdk';
+
+(async () => {
+    const results = await search('الإسلام', { category: 6 });
+    console.log(results);
+})();
+```
+
+Parameters:
+
+`query` (`string`): The search query string.
+
+`options` (`SearchOptions`, optional): Additional search options such as category or sorting field.
+
+Returns: A promise that resolves to the search results, including count and data.
+
+## Contributing
+
+If you'd like to contribute to the SDK, feel free to fork the repository and submit a pull request. Contributions are welcome!
+
+## License
+
+This SDK is licensed under the MIT License.

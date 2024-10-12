@@ -1,4 +1,4 @@
-type SearchResult = {
+export type SearchResult = {
     author_id: number;
     book_id: number;
     cat_id: number;
@@ -14,8 +14,10 @@ export type SearchApiResponse = {
 
 export type SearchApiQueryParameters = {
     author?: number;
-    book: number;
-    precision: number;
+    book?: number;
+    cat_id?: number;
+    page?: number;
+    precision?: number;
     q: string;
     sort?: string;
     ver: number;

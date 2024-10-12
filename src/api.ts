@@ -1,12 +1,22 @@
-import { PageResponse } from './types';
+import { PageMetadata, PageResult, SearchOptions, SearchResults } from './types';
 import { AuthorApiQueryParameters, AuthorApiResponse } from './types/api/author';
+import { BookApiQueryParameters, BookApiResponse, Includes } from './types/api/book';
 import { BookFileApiResponse } from './types/api/bookFile';
-import { PageApiQueryParameters, PageApiResponse, PageResponseMetadata } from './types/api/page';
+import { PageApiQueryParameters, PageApiResponse } from './types/api/page';
 import { SearchApiQueryParameters, SearchApiResponse } from './types/api/search';
 import { getFileJson, getJson } from './utils/network';
 
+const API_VERSION_NUMBER = 3;
+
+/**
+ * Fetches author information by ID.
+ *
+ * @param id - The unique identifier of the author to retrieve.
+ * @returns A promise that resolves to the author information.
+ * @throws Will throw an error if the author is not found.
+ */
 export const getAuthor = async (id: number): Promise<AuthorApiResponse> => {
-    const queryParams: AuthorApiQueryParameters = { id, ver: 3 };
+    const queryParams: AuthorApiQueryParameters = { id, ver: API_VERSION_NUMBER };
     const { info } = (await getJson('/author', queryParams)) as AuthorApiResponse;
 
     if (!info) {
@@ -16,6 +26,13 @@ export const getAuthor = async (id: number): Promise<AuthorApiResponse> => {
     return { info };
 };
 
+/**
+ * Fetches the book contents by ID.
+ *
+ * @param id - The unique identifier of the book to retrieve.
+ * @returns A promise that resolves to the book file information.
+ * @throws Will throw an error if the book file is not found.
+ */
 export const getBookFile = async (id: number): Promise<BookFileApiResponse> => {
     try {
         const file = (await getFileJson(`/${id}.json`)) as BookFileApiResponse;
@@ -29,19 +46,57 @@ export const getBookFile = async (id: number): Promise<BookFileApiResponse> => {
     }
 };
 
-export const getPage = async (bookId: number, pageNumber: number): Promise<PageResponse> => {
-    const queryParams: PageApiQueryParameters = { book_id: bookId, pg: pageNumber, ver: 3 };
+/**
+ * Fetches the book information by ID.
+ *
+ * @param id - The unique identifier of the book to retrieve.
+ * @returns A promise that resolves to the book information including indexes.
+ */
+export const getBookInfo = async (id: number): Promise<BookApiResponse> => {
+    const queryParams: BookApiQueryParameters = { id, include: Includes.Indexes, ver: API_VERSION_NUMBER };
+    const book = (await getJson(`/book`, queryParams)) as BookApiResponse;
+
+    return book;
+};
+
+/**
+ * Fetches a specific page from a book by book ID and page number.
+ *
+ * @param bookId - The unique identifier of the book.
+ * @param pageNumber - The page number to retrieve.
+ * @returns A promise that resolves to the page metadata and text.
+ * @throws Will throw an error if the page is not found.
+ */
+export const getPage = async (bookId: number, pageNumber: number): Promise<PageResult> => {
+    const queryParams: PageApiQueryParameters = { book_id: bookId, pg: pageNumber, ver: API_VERSION_NUMBER };
     const { meta, text } = (await getJson('/page', queryParams)) as PageApiResponse;
 
     if (!meta && !text) {
         throw new Error(`Book ${bookId}, page ${pageNumber} not found`);
     }
 
-    return { meta: JSON.parse(meta) as PageResponseMetadata, text };
+    return { meta: JSON.parse(meta) as PageMetadata, text };
 };
 
-export const search = async (id: number) => {
-    const queryParams: SearchApiQueryParameters = {};
-    const searchResults = (await getJson('/search')) as SearchApiResponse;
-    const file = (await getFileJson(`/${id}.json`)) as BookFileApiResponse;
+/**
+ * Searches for books or content using a query string.
+ *
+ * @param query - The search query string.
+ * @param options - Optional search options, such as category or sort field.
+ * @returns A promise that resolves to the search results.
+ */
+export const search = async (
+    query: string,
+    { category, sortField, ...options }: SearchOptions = {},
+): Promise<SearchResults> => {
+    const queryParams: SearchApiQueryParameters = {
+        ...options,
+        ...(category && { cat_id: category }),
+        ...(sortField && { sort: sortField }),
+        q: query,
+        ver: API_VERSION_NUMBER,
+    };
+    const { count, data } = (await getJson('/search', queryParams)) as SearchApiResponse;
+
+    return { count, data: data.map((r) => ({ ...r, meta: JSON.parse(r.meta) })) };
 };
