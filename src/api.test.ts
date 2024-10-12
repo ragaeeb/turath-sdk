@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
-import { getAuthor, getBookFile, getBookInfo, getPage, search } from '../src/index';
+import { getAuthor, getBookFile, getBookInfo, getPage, search, SortField } from '../src/index';
 import { getFileJson, getJson } from './utils/network';
 
 vi.mock('./utils/network');
@@ -66,6 +66,81 @@ describe('api', () => {
 
             expect(book).toEqual({
                 info: 'A',
+            });
+        });
+    });
+
+    describe('getPage', () => {
+        it('should get page information', async () => {
+            (getJson as Mock).mockResolvedValue({ meta: '{"foo":"abcd"}', text: 'body' });
+            const page = await getPage(100, 1207);
+
+            expect(getJson).toHaveBeenCalledOnce();
+            expect(getJson).toHaveBeenCalledWith('/page', { book_id: 100, pg: 1207, ver: 3 });
+
+            expect(page).toEqual({
+                meta: { foo: 'abcd' },
+                text: 'body',
+            });
+        });
+
+        it('should throw error when not found', async () => {
+            (getJson as Mock).mockResolvedValue({});
+
+            await expect(getPage(123, 567)).rejects.toThrow(`Book 123, page 567 not found`);
+        });
+    });
+
+    describe('search', () => {
+        it('should search with just query', async () => {
+            (getJson as Mock).mockResolvedValue({ count: 1, data: [{ meta: '{"foo":"abcd"}', text: '123' }] });
+            const results = await search('query');
+
+            expect(getJson).toHaveBeenCalledOnce();
+            expect(getJson).toHaveBeenCalledWith('/search', { q: 'query', ver: 3 });
+
+            expect(results).toEqual({
+                count: 1,
+                data: [{ meta: { foo: 'abcd' }, text: '123' }],
+            });
+        });
+
+        it('should filter by category and sort', async () => {
+            (getJson as Mock).mockResolvedValue({ count: 1, data: [{ meta: '{}', text: '123' }] });
+            const results = await search('query', { category: 2, sortField: SortField.PageId });
+
+            expect(getJson).toHaveBeenCalledOnce();
+            expect(getJson).toHaveBeenCalledWith('/search', { cat_id: 2, q: 'query', sort: 'page_id', ver: 3 });
+
+            expect(results).toEqual({
+                count: 1,
+                data: [{ meta: {}, text: '123' }],
+            });
+        });
+
+        it('should filter by author, book, and precision', async () => {
+            (getJson as Mock).mockResolvedValue({ count: 1, data: [{ meta: '{}', text: '123' }] });
+            const results = await search('query', { author: 1, book: 2, precision: 3 });
+
+            expect(getJson).toHaveBeenCalledOnce();
+            expect(getJson).toHaveBeenCalledWith('/search', { author: 1, book: 2, precision: 3, q: 'query', ver: 3 });
+
+            expect(results).toEqual({
+                count: 1,
+                data: [{ meta: {}, text: '123' }],
+            });
+        });
+
+        it('should access next page of results', async () => {
+            (getJson as Mock).mockResolvedValue({ count: 1, data: [{ meta: '{}', text: '123' }] });
+            const results = await search('query', { author: 1, category: 3, page: 2 });
+
+            expect(getJson).toHaveBeenCalledOnce();
+            expect(getJson).toHaveBeenCalledWith('/search', { author: 1, cat_id: 3, page: 2, q: 'query', ver: 3 });
+
+            expect(results).toEqual({
+                count: 1,
+                data: [{ meta: {}, text: '123' }],
             });
         });
     });
