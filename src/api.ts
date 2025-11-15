@@ -1,12 +1,28 @@
-import { PageMetadata, PageResult, SearchOptions, SearchResults } from './types';
-import { AuthorApiQueryParameters, AuthorApiResponse } from './types/api/author';
-import { BookApiQueryParameters, BookApiResponse, Includes } from './types/api/book';
-import { BookFileApiResponse } from './types/api/bookFile';
-import { PageApiQueryParameters, PageApiResponse } from './types/api/page';
-import { SearchApiQueryParameters, SearchApiResponse } from './types/api/search';
+import type { PageMetadata, PageResult, SearchOptions, SearchResults } from './types';
+import type { AuthorApiQueryParameters, AuthorApiResponse } from './types/api/author';
+import type { BookApiQueryParameters, BookApiResponse } from './types/api/book';
+import { Includes } from './types/api/book';
+import type { BookFileApiResponse } from './types/api/bookFile';
+import type { PageApiQueryParameters, PageApiResponse } from './types/api/page';
+import type { SearchApiQueryParameters, SearchApiResponse } from './types/api/search';
 import { getFileJson, getJson } from './utils/network';
 
+/**
+ * Version of the public API requested for all outbound calls.
+ */
 const API_VERSION_NUMBER = 3;
+
+/**
+ * Runtime type guard ensuring a thrown error exposes an HTTP status code.
+ */
+const isHttpError = (error: unknown): error is { status: number } => {
+    return (
+        typeof error === 'object' &&
+        error !== null &&
+        'status' in error &&
+        typeof (error as { status?: unknown }).status === 'number'
+    );
+};
 
 /**
  * Fetches author information by ID.
@@ -37,12 +53,12 @@ export const getBookFile = async (id: number): Promise<BookFileApiResponse> => {
     try {
         const file = (await getFileJson(`/${id}.json`)) as BookFileApiResponse;
         return file;
-    } catch (err: any) {
-        if (err.status === 404) {
+    } catch (error: unknown) {
+        if (isHttpError(error) && error.status === 404) {
             throw new Error(`Book ${id} not found`);
         }
 
-        throw err;
+        throw error;
     }
 };
 

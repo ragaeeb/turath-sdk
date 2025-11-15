@@ -1,4 +1,15 @@
-[![wakatime](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/c57d4b46-a567-4de0-9c97-a4589b33f8ee.svg)](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/c57d4b46-a567-4de0-9c97-a4589b33f8ee) [![E2E](https://github.com/ragaeeb/turath-sdk/actions/workflows/e2e.yml/badge.svg)](https://github.com/ragaeeb/turath-sdk/actions/workflows/e2e.yml) [![Node.js CI](https://github.com/ragaeeb/turath-sdk/actions/workflows/build.yml/badge.svg)](https://github.com/ragaeeb/turath-sdk/actions/workflows/build.yml) ![GitHub License](https://img.shields.io/github/license/ragaeeb/turath-sdk) ![GitHub Release](https://img.shields.io/github/v/release/ragaeeb/turath-sdk) [![codecov](https://codecov.io/gh/ragaeeb/turath-sdk/graph/badge.svg?token=82MVUIM7MJ)](https://codecov.io/gh/ragaeeb/turath-sdk) [![Size](https://deno.bundlejs.com/badge?q=turath-sdk@1.0.0)](https://bundlejs.com/?q=turath-sdk%401.0.0) ![typescript](https://badgen.net/badge/icon/typescript?icon=typescript&label&color=blue) ![npm](https://img.shields.io/npm/v/turath-sdk) ![npm](https://img.shields.io/npm/dm/turath-sdk) ![GitHub issues](https://img.shields.io/github/issues/ragaeeb/turath-sdk) ![GitHub stars](https://img.shields.io/github/stars/ragaeeb/turath-sdk?style=social)
+[![wakatime](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/c57d4b46-a567-4de0-9c97-a4589b33f8ee.svg)](https://wakatime.com/badge/user/a0b906ce-b8e7-4463-8bce-383238df6d4b/project/c57d4b46-a567-4de0-9c97-a4589b33f8ee)
+[![E2E](https://github.com/ragaeeb/turath-sdk/actions/workflows/e2e.yml/badge.svg)](https://github.com/ragaeeb/turath-sdk/actions/workflows/e2e.yml)
+[![Node.js CI](https://github.com/ragaeeb/turath-sdk/actions/workflows/build.yml/badge.svg)](https://github.com/ragaeeb/turath-sdk/actions/workflows/build.yml)
+![GitHub License](https://img.shields.io/github/license/ragaeeb/turath-sdk)
+![GitHub Release](https://img.shields.io/github/v/release/ragaeeb/turath-sdk)
+[![codecov](https://codecov.io/gh/ragaeeb/turath-sdk/graph/badge.svg?token=82MVUIM7MJ)](https://codecov.io/gh/ragaeeb/turath-sdk)
+[![Size](https://deno.bundlejs.com/badge?q=turath-sdk@latest)](https://bundlejs.com/?q=turath-sdk%40latest)
+![typescript](https://badgen.net/badge/icon/typescript?icon=typescript&label&color=blue)
+![npm](https://img.shields.io/npm/v/turath-sdk)
+![npm](https://img.shields.io/npm/dm/turath-sdk)
+![GitHub issues](https://img.shields.io/github/issues/ragaeeb/turath-sdk)
+![GitHub stars](https://img.shields.io/github/stars/ragaeeb/turath-sdk?style=social)
 
 # turath-sdk
 
@@ -6,23 +17,53 @@ JavaScript SDK for accessing the books and resources provided by turath.io. This
 
 ## Installation
 
-To install turath-sdk, use npm or yarn:
+Install `turath-sdk` using your preferred JavaScript package manager:
 
 ```bash
+bun add turath-sdk
+# or
 npm install turath-sdk
 # or
 yarn add turath-sdk
-# or
-pnpm i turath-sdk
 ```
 
 ## Requirements
 
-Node.js >= `20.0.0`
+Node.js >= `22.0.0`
+
+## Development
+
+This repository uses [Bun](https://bun.sh/) for dependency management and testing during development.
+
+```bash
+bun install
+bun run build
+bun test           # unit tests with coverage
+bun test testing   # end-to-end tests
+bun run lint       # Biome static analysis
+```
+
+## Exports
+
+The SDK exports strongly-typed helpers and data structures for working with turath.io:
+
+| Export | Type | Description |
+| --- | --- | --- |
+| `getAuthor` | `(id: number) => Promise<AuthorApiResponse>` | Fetch author biography metadata. |
+| `getBookFile` | `(id: number) => Promise<BookFileApiResponse>` | Retrieve the full JSON dump for a book. |
+| `getBookInfo` | `(id: number) => Promise<BookApiResponse>` | Fetch high-level book metadata and indexes. |
+| `getPage` | `(bookId: number, pageNumber: number) => Promise<PageResult>` | Load a parsed page including metadata. |
+| `search` | `(query: string, options?: SearchOptions) => Promise<SearchResults>` | Run catalog searches with filters. |
+| `SortField` | `enum` | Sorting options for the `search` helper. |
+| `SearchOptions` | `type` | Optional filters accepted by `search`. |
+| `SearchResult` | `type` | Parsed representation of a single search hit. |
+| `SearchResults` | `type` | Envelope returned by the `search` helper. |
+| `PageMetadata` | `type` | Metadata describing page attribution and headings. |
+| `PageResult` | `type` | Page lookup result combining text and metadata. |
 
 ## Usage
 
-The SDK provides several functions to interact with the turath.io API. Below are the main functions that you can use:
+The sections below demonstrate how to use each helper and highlight the available options.
 
 ### Importing the SDK
 
@@ -30,7 +71,7 @@ The SDK provides several functions to interact with the turath.io API. Below are
 import { getBookInfo } from 'turath-sdk';
 ```
 
-### 1. getAuthor
+### 1. `getAuthor`
 
 Fetches information about an author by their ID.
 
@@ -143,7 +184,14 @@ Parameters:
 
 `query` (`string`): The search query string.
 
-`options` (`SearchOptions`, optional): Additional search options such as category or sorting field.
+`options` (`SearchOptions`, optional): Additional search options such as category or sorting field. Available options are:
+
+- `author` (`number`): Filter results to a specific author ID.
+- `book` (`number`): Restrict matches to a single book ID.
+- `category` (`number`): Filter by category identifier.
+- `page` (`number`): Retrieve a specific page of results.
+- `precision` (`number`): Pass-through precision flag used by the API.
+- `sortField` (`SortField`): Sort the results (currently `SortField.PageId`).
 
 Returns: A promise that resolves to the search results, including count and data.
 

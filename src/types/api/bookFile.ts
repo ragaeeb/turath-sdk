@@ -1,52 +1,93 @@
-// Meta information about a book
+/**
+ * Meta information about a book.
+ */
 type BookMeta = {
-    author_id: number; // ID of the author
-    cat_id: number; // Category ID for classification
-    date_built: number; // Unix timestamp for when the data was built
-    details: string; // Details about the book, including author and edition information
-    has_pdf: boolean; // Flag indicating if a PDF is available
-    id: number; // Unique identifier for the book
-    name: string; // Name of the book
-    size: number; // Size of the book in bytes (presumably for PDF)
+    /** Identifier of the author who wrote the book. */
+    author_id: number;
+    /** Category identifier that classifies the book. */
+    cat_id: number;
+    /** Unix timestamp indicating when the data snapshot was generated. */
+    date_built: number;
+    /** Free-form description covering edition details and other notes. */
+    details: string;
+    /** Indicates whether an associated PDF is available. */
+    has_pdf: boolean;
+    /** Unique identifier for the book. */
+    id: number;
+    /** Display name of the book. */
+    name: string;
+    /** Size of the downloadable book asset in bytes. */
+    size: number;
 };
 
-// Index information about the book, including volumes and PDF mappings
-type BookIndexes = {
-    hadiths: Record<string, number>; // Mapping of hadith ID to the corresponding number within a volume
-    headings: Heading[]; // List of headings in the book
-    pdf_base: string; // Base path or name used for locating PDFs
-    pdfs: Record<string, string>; // Mapping of volume name to corresponding PDF file name
-    volumes: string[]; // List of volume names, e.g., ['المقدمة', '1', '2']
-};
-
-// A heading within the book, which includes a title, level, and page number
+/**
+ * Heading information used to navigate the book contents.
+ */
 type Heading = {
-    level: number; // Level of the heading (e.g., 1 for main heading, 2 for subheading)
-    page: number; // Page number where the heading appears
-    title: string; // Title of the heading
+    /** Hierarchical level of the heading within the book structure. */
+    level: number;
+    /** Page number where the heading begins. */
+    page: number;
+    /** Human-readable title of the heading. */
+    title: string;
 };
 
-// Generated index information, providing page mappings and volume boundaries
+/**
+ * Index information about the book, including volumes and PDF mappings.
+ */
+type BookIndexes = {
+    /** Mapping of hadith identifier to the page number where it appears. */
+    hadiths: Record<string, number>;
+    /** List of navigational headings within the book. */
+    headings: Heading[];
+    /** Base path or identifier used to locate the PDF assets. */
+    pdf_base: string;
+    /** Mapping of volume identifiers to their PDF filenames. */
+    pdfs: Record<string, string>;
+    /** Ordered list of volume names within the work. */
+    volumes: string[];
+};
+
+/**
+ * Generated index information providing page mappings and volume boundaries.
+ */
 type GeneratedIndexes = {
-    hadith_max: string; // Maximum number of hadiths found in the book
-    hadith_pages: Record<string, string>; // Mapping of hadith number to page
-    page_headings: Record<number, number[]>; // Mapping of page number to a list of heading indices
-    page_map: (null | string)[]; // Array mapping logical page to print page reference
-    print_pg_to_pg: Record<string, number>; // Mapping from print pages to logical pages
-    volume_bounds: Record<string, [number, number]>; // Boundaries for each volume in terms of page numbers
+    /** Maximum hadith identifier present in the book. */
+    hadith_max: string;
+    /** Mapping of hadith identifiers to their corresponding pages. */
+    hadith_pages: Record<string, string>;
+    /** Mapping of page numbers to heading indices. */
+    page_headings: Record<number, number[]>;
+    /** Array mapping logical pages to their print-page references. */
+    page_map: (null | string)[];
+    /** Mapping from printed page references to logical page numbers. */
+    print_pg_to_pg: Record<string, number>;
+    /** Boundaries for each volume in the form of starting and ending page numbers. */
+    volume_bounds: Record<string, [number, number]>;
 };
 
-// Represents an individual page within the book
+/**
+ * Represents an individual page within the book.
+ */
 type BookPage = {
-    page?: number; // Page number or identifier within the volume
-    text: string; // Text content of the page
-    vol?: string; // Volume identifier the page belongs to
+    /** Page number or identifier within the volume. */
+    page?: number;
+    /** Text content of the page. */
+    text: string;
+    /** Volume identifier that the page belongs to. */
+    vol?: string;
 };
 
-// Main structure representing the complete book information
+/**
+ * Complete book information returned by the static file endpoint.
+ */
 export type BookFileApiResponse = {
-    indexes: BookIndexes; // Indexes for navigating the book
-    indexes_generated: GeneratedIndexes; // Additional generated index information
-    meta: BookMeta; // Metadata about the book
-    pages: BookPage[]; // List of pages in the book
+    /** Indexes for navigating the book. */
+    indexes: BookIndexes;
+    /** Additional generated index information for cross-references. */
+    indexes_generated: GeneratedIndexes;
+    /** Metadata describing the book. */
+    meta: BookMeta;
+    /** Full set of rendered book pages. */
+    pages: BookPage[];
 };
