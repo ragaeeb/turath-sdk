@@ -1,11 +1,15 @@
-import { PageMetadata, PageResult, SearchOptions, SearchResults } from './types';
-import { AuthorApiQueryParameters, AuthorApiResponse } from './types/api/author';
-import { BookApiQueryParameters, BookApiResponse, Includes } from './types/api/book';
-import { BookFileApiResponse } from './types/api/bookFile';
-import { PageApiQueryParameters, PageApiResponse } from './types/api/page';
-import { SearchApiQueryParameters, SearchApiResponse } from './types/api/search';
+import type { PageMetadata, PageResult, SearchOptions, SearchResults } from './types';
+import type { AuthorApiQueryParameters, AuthorApiResponse } from './types/api/author';
+import type { BookApiQueryParameters, BookApiResponse } from './types/api/book';
+import { Includes } from './types/api/book';
+import type { BookFileApiResponse } from './types/api/bookFile';
+import type { PageApiQueryParameters, PageApiResponse } from './types/api/page';
+import type { SearchApiQueryParameters, SearchApiResponse } from './types/api/search';
 import { getFileJson, getJson } from './utils/network';
 
+/**
+ * Version of the public API requested for all outbound calls.
+ */
 const API_VERSION_NUMBER = 3;
 
 /**

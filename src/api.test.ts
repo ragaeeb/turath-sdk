@@ -1,13 +1,17 @@
-import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, mock } from 'bun:test';
 
-import { getAuthor, getBookFile, getBookInfo, getPage, search, SortField } from '../src/index';
-import { getFileJson, getJson } from './utils/network';
+mock.module('./utils/network', () => ({
+    getFileJson: mock(),
+    getJson: mock(),
+}));
 
-vi.mock('./utils/network');
+const { getAuthor, getBookFile, getBookInfo, getPage, search, SortField } = await import('../src/index');
+const { getFileJson, getJson } = await import('./utils/network');
 
 describe('api', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
+        (getJson as Mock).mockReset();
+        (getFileJson as Mock).mockReset();
     });
 
     describe('getAuthor', () => {

@@ -1,3 +1,6 @@
+/**
+ * Query parameters supported by the `/book` endpoint.
+ */
 export type BookQueryParams = {
     /**
      * ID of the book to fetch.
@@ -16,7 +19,9 @@ export type BookQueryParams = {
     ver?: number;
 };
 
-// Metadata of the book
+/**
+ * Metadata describing core attributes of the book.
+ */
 export type BookMeta = {
     /**
      * ID of the author.
@@ -74,7 +79,9 @@ export type BookMeta = {
     version: string;
 };
 
-// Definition for each heading in the index
+/**
+ * Definition for each heading in the index.
+ */
 export type BookHeading = {
     /**
      * Level of the heading (e.g., 1 for major sections, 3 for smaller subsections).
@@ -92,7 +99,9 @@ export type BookHeading = {
     title: string;
 };
 
-// Indexes that exist in the book
+/**
+ * Indexes that exist in the book.
+ */
 export type BookIndexes = {
     /**
      * Headings present within the book.
@@ -130,6 +139,9 @@ export type BookIndexes = {
     volumes: string[];
 };
 
+/**
+ * Response payload returned from the `/book` endpoint.
+ */
 export type BookApiResponse = {
     /**
      * Indexes of the book.
@@ -142,12 +154,21 @@ export type BookApiResponse = {
     meta: BookMeta;
 };
 
+/**
+ * Supported include flags for enriching the `/book` response.
+ */
 export enum Includes {
     Indexes = 'indexes',
 }
 
+/**
+ * Strongly-typed parameters for the `/book` API helper.
+ */
 export type BookApiQueryParameters = {
+    /** Unique book identifier. */
     id: number;
+    /** Optional include flag. */
     include?: Includes;
+    /** API version number. */
     ver: number;
 };

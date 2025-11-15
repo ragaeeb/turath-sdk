@@ -20,6 +20,18 @@ pnpm i turath-sdk
 
 Node.js >= `20.0.0`
 
+## Development
+
+This repository uses [Bun](https://bun.sh/) for dependency management and testing during development.
+
+```bash
+bun install
+bun run build
+bun test           # unit tests with coverage
+bun test testing   # end-to-end tests
+bun run lint       # Biome static analysis
+```
+
 ## Usage
 
 The SDK provides several functions to interact with the turath.io API. Below are the main functions that you can use:
