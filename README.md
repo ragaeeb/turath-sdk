@@ -6,19 +6,19 @@ JavaScript SDK for accessing the books and resources provided by turath.io. This
 
 ## Installation
 
-To install turath-sdk, use npm or yarn:
+Install `turath-sdk` using your preferred JavaScript package manager:
 
 ```bash
+bun add turath-sdk
+# or
 npm install turath-sdk
 # or
 yarn add turath-sdk
-# or
-pnpm i turath-sdk
 ```
 
 ## Requirements
 
-Node.js >= `20.0.0`
+Node.js >= `22.0.0`
 
 ## Development
 
@@ -32,9 +32,27 @@ bun test testing   # end-to-end tests
 bun run lint       # Biome static analysis
 ```
 
+## Exports
+
+The SDK exports strongly-typed helpers and data structures for working with turath.io:
+
+| Export | Type | Description |
+| --- | --- | --- |
+| `getAuthor` | `(id: number) => Promise<AuthorApiResponse>` | Fetch author biography metadata. |
+| `getBookFile` | `(id: number) => Promise<BookFileApiResponse>` | Retrieve the full JSON dump for a book. |
+| `getBookInfo` | `(id: number) => Promise<BookApiResponse>` | Fetch high-level book metadata and indexes. |
+| `getPage` | `(bookId: number, pageNumber: number) => Promise<PageResult>` | Load a parsed page including metadata. |
+| `search` | `(query: string, options?: SearchOptions) => Promise<SearchResults>` | Run catalog searches with filters. |
+| `SortField` | `enum` | Sorting options for the `search` helper. |
+| `SearchOptions` | `type` | Optional filters accepted by `search`. |
+| `SearchResult` | `type` | Parsed representation of a single search hit. |
+| `SearchResults` | `type` | Envelope returned by the `search` helper. |
+| `PageMetadata` | `type` | Metadata describing page attribution and headings. |
+| `PageResult` | `type` | Page lookup result combining text and metadata. |
+
 ## Usage
 
-The SDK provides several functions to interact with the turath.io API. Below are the main functions that you can use:
+The sections below demonstrate how to use each helper and highlight the available options.
 
 ### Importing the SDK
 
@@ -42,7 +60,7 @@ The SDK provides several functions to interact with the turath.io API. Below are
 import { getBookInfo } from 'turath-sdk';
 ```
 
-### 1. getAuthor
+### 1. `getAuthor`
 
 Fetches information about an author by their ID.
 
@@ -155,7 +173,14 @@ Parameters:
 
 `query` (`string`): The search query string.
 
-`options` (`SearchOptions`, optional): Additional search options such as category or sorting field.
+`options` (`SearchOptions`, optional): Additional search options such as category or sorting field. Available options are:
+
+- `author` (`number`): Filter results to a specific author ID.
+- `book` (`number`): Restrict matches to a single book ID.
+- `category` (`number`): Filter by category identifier.
+- `page` (`number`): Retrieve a specific page of results.
+- `precision` (`number`): Pass-through precision flag used by the API.
+- `sortField` (`SortField`): Sort the results (currently `SortField.PageId`).
 
 Returns: A promise that resolves to the search results, including count and data.
 

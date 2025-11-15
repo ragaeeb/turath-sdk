@@ -13,6 +13,18 @@ import { getFileJson, getJson } from './utils/network';
 const API_VERSION_NUMBER = 3;
 
 /**
+ * Runtime type guard ensuring a thrown error exposes an HTTP status code.
+ */
+const isHttpError = (error: unknown): error is { status: number } => {
+    return (
+        typeof error === 'object' &&
+        error !== null &&
+        'status' in error &&
+        typeof (error as { status?: unknown }).status === 'number'
+    );
+};
+
+/**
  * Fetches author information by ID.
  *
  * @param id - The unique identifier of the author to retrieve.
@@ -41,12 +53,12 @@ export const getBookFile = async (id: number): Promise<BookFileApiResponse> => {
     try {
         const file = (await getFileJson(`/${id}.json`)) as BookFileApiResponse;
         return file;
-    } catch (err: any) {
-        if (err.status === 404) {
+    } catch (error: unknown) {
+        if (isHttpError(error) && error.status === 404) {
             throw new Error(`Book ${id} not found`);
         }
 
-        throw err;
+        throw error;
     }
 };
 
